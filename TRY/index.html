@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Timetable Generator</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #000;
+            text-align: center;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .title {
+            font-size: 1.5em;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+        }
+        .form-group button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="title">Enter Your Courses</div>
+
+<div class="form-group">
+    <label for="numCourses">Number of Courses:</label>
+    <input type="number" id="numCourses" min="1" required>
+    <button onclick="generateInputFields()">Generate Fields</button>
+</div>
+
+<div id="courseFields"></div>
+
+<div class="form-group">
+    <button onclick="generateTimetable()">Generate Timetable</button>
+</div>
+
+<div id="timetableContainer"></div>
+
+<!-- Datalist for course suggestions -->
+<datalist id="courseSuggestions"></datalist>
+
+</body>
+</html>
+
+<script>
+    const allCourses = [
+        'Blockchain and Web3 Development', 
+    'Data Analytics I', 
+    'Earthquake Resistant Design of Masonry Structures', 
+    'Probability and Random Processes', 
+    'Thinking and Knowing in the Human Sciences – III', 
+    'CMOS References and Regulators',
+    'Introduction to Biology', 
+    'Introduction to Quantum Field Theory', 
+    'Operating Systems and Networks', 
+    'Signal Processing', 
+    'Structural Dynamics', 
+    'Topics in Nanosciences', 
+    'Retrofit of Existing Infrastructure(H2)', 
+    'Software Systems Development',
+    'Advanced Computer Architecture', 
+    'Behavioral Research & Experimental Design', 
+    'Digital Image Processing', 
+    'Distributed Systems', 
+    'Environmental Science & Technology', 
+    'Language and Society', 
+    'Theory of Elasticity', 
+    'Science 1', 
+    'Quantum Mechanics', 
+    'Hydrological Modelling and Software Development',
+    'Learning and Memory', 
+    'Structural Engineering Design Studio', 
+    'Topics in Applied Optimization', 
+    'Quantum Information Theory', 
+    'Open Quantum Systems and Quantum Thermodynamics',
+    'Advanced Computer Networks', 
+    'Automata Theory (H1)', 
+    'Bioinformatics (H1)', 
+    'Data and Applications (H2)', 
+    'Information Theory', 
+    'Introduction to Remote Sensing', 
+    'MCS 1 - Probability and Statistics (H1)', 
+    'MCS 2 - Linear Algebra (H2)', 
+    'Structural Safety of Built Infrastructure', 
+    'Systems Biology (H2)', 
+    'Principles of Semiconductor Devices', 
+    'Information Retrieval & Extraction', 
+    'Wireless Communications',
+    'Introduction to Economics', 
+    'Introduction to Film Studies', 
+    'Intro to Psychology',
+    'Advanced Operating Systems', 
+    'Chemistry Topics for Engineers', 
+    'Computer Problem Solving', 
+    'Physics of Early Universe', 
+    'Software Quality Engineering',
+    'Advanced Design of Steel Structures', 
+    'Algorithm Analysis and Design', 
+    'Chemical Kinetics and Reaction Dynamics (H2)', 
+    'Computational Linguistics II', 
+    'Design for Testability', 
+    'Fairness, Privacy and Ethics in AI', 
+    'Foundations for Signal Processing and Communication', 
+    'Modern Complexity Theory', 
+    'Spectroscopy(H1)', 
+    'Spatial Informatics',
+    'Applied Ethics', 
+    'Biomolecular Structure Interaction & Dynamics', 
+    'Data Structures & Algorithms for Problem Solving', 
+    'Entropy and Information', 
+    'Finite Element Methods', 
+    'Thinking and Knowing in the Human Sciences – II', 
+    'Geospatial Technology for Disaster Risk Modelling',
+    'Algorithms and Operating Systems', 
+    'IoT Workshop', 
+    'Intro to Cognitive Science', 
+    'Introduction to Neural and Cognitive Modeling', 
+    'Mobile Robotics', 
+    'Research in Information Security', 
+    'Signal Detection and Estimation Theory', 
+    'Systems Thinking', 
+    'Design for Social Innovation', 
+    'Speech Analysis and Linguistics',
+    'Basics of Ethics (H1)', 
+    'Gender and Society', 
+    'Introduction to Philosophy', 
+    'Music Workshop', 
+    'Introduction to Politics', 
+    'CASE Seminar', 
+    'Human Computer Interaction (H2)',
+    'Statistical Methods in AI',
+    'Basics of Ethics (H2)', 
+    'Introduction to History', 
+    'Work, Entrepreneurship and Technology in Contemporary Societies', 
+    'Readings from Hindi Literature', 
+    'Design Thinking - Research to Define (H1)', 
+    'Design Thinking - Idea to Evaluate (H2)',
+    'Advanced NLP', 
+    'Digital VLSI Design', 
+    'Modern Coding Theory', 
+    'Probability and Statistics', 
+    'VLSI Design', 
+    'Principles of Programming Languages', 
+    'Robotics: Dynamics and Control', 
+    'Product Management 101 (H1)', 
+    'User Research Methods (H2)', 
+    'Product Marketing'
+        // Add more courses as needed
+    ];
+
+    function generateInputFields() {
+        const numCourses = document.getElementById('numCourses').value;
+        const courseFields = document.getElementById('courseFields');
+        courseFields.innerHTML = '';
+
+        for (let i = 0; i < numCourses; i++) {
+            const fieldGroup = document.createElement('div');
+            fieldGroup.classList.add('form-group');
+
+            const label = document.createElement('label');
+            label.textContent = `Course ${i + 1}:`;
+            fieldGroup.appendChild(label);
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.classList.add('courseInput');
+            input.setAttribute('list', 'courseSuggestions');
+            input.addEventListener('input', showSuggestions);
+            fieldGroup.appendChild(input);
+
+            courseFields.appendChild(fieldGroup);
+        }
+    }
+
+    function showSuggestions(event) {
+        const input = event.target;
+        const value = input.value.toLowerCase();
+        const suggestions = document.getElementById('courseSuggestions');
+
+        suggestions.innerHTML = '';
+
+        if (value) {
+            const filteredCourses = allCourses.filter(course => 
+                course.toLowerCase().includes(value)
+            );
+
+            filteredCourses.forEach(course => {
+                const option = document.createElement('option');
+                option.value = course;
+                suggestions.appendChild(option);
+            });
+        }
+    }
+
+    async function generateTimetable() {
+        const courseInputs = document.querySelectorAll('.courseInput');
+        const courses = Array.from(courseInputs).map(input => input.value);
+
+        const response = await fetch('/generate-timetable', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ courses })
+        });
+
+        const data = await response.json();
+        const timetableContainer = document.getElementById('timetableContainer');
+        timetableContainer.innerHTML = data.html;
+
+        const downloadLink = document.createElement('a');
+        downloadLink.href = `/download-timetable?courses=${encodeURIComponent(courses.join(','))}`;
+        downloadLink.textContent = 'Download PDF';
+        timetableContainer.appendChild(downloadLink);
+    }
+</script>
